@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import MapView from "@/components/MapView";
+import MapView, { MapViewHandle } from "@/components/MapView";
+import SearchBar from "@/components/SearchBar";
 import WeatherView from "@/components/WeatherView";
 import { fields as initialFieldsData, Field } from "@/data/fields";
 import SidePanel from "@/components/SidePanel";
@@ -37,6 +38,7 @@ const Index = () => {
   const isMobile = useIsMobile();
   const [view, setView] = useState<"map" | "analytics">("map");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const mapViewRef = useRef<MapViewHandle>(null);
   const startDrawRef = useRef<(() => void) | null>(null);
   const handleStartDraw = useCallback(() => { startDrawRef.current?.(); }, []);
   const [allFields, setAllFields] = useState<Field[]>(loadAllFields);
@@ -152,10 +154,16 @@ const Index = () => {
   return (
     <div className="h-screen w-screen bg-surface-outer flex items-center justify-center p-6">
       <div className="w-full h-full max-w-[1400px] max-h-[900px] rounded-2xl overflow-hidden bg-background shadow-2xl relative border-[#041009] border-2">
+        {/* SearchBar centered over the full card, always stable */}
+        <div className="absolute top-4 left-0 right-0 flex justify-center z-20 pointer-events-none">
+          <div className="pointer-events-auto">
+            <SearchBar onSearch={() => {}} onLocationSelect={(lng, lat) => mapViewRef.current?.flyToLocation(lng, lat)} />
+          </div>
+        </div>
         <div className="flex w-full h-full">
           <div className="flex-1 relative">
             <div className="absolute inset-0 transition-opacity duration-200" style={{ opacity: view === "map" ? 1 : 0, pointerEvents: view === "map" ? "auto" : "none" }}>
-              <MapView allFields={allFields} selectedFields={selectedFields} activeField={activeField} flyToField={flyToField}
+              <MapView ref={mapViewRef} allFields={allFields} selectedFields={selectedFields} activeField={activeField} flyToField={flyToField}
                 onFlyToDone={() => setFlyToField(null)} onFieldClickOnMap={(field) => { setActiveField(field); setDetailField(field); }}
                 onAddField={handleAddField} editBoundaryFieldId={editBoundaryFieldId} onUpdateField={handleUpdateField} onCancelEditBoundary={() => setEditBoundaryFieldId(null)}
                 onRequestStartDraw={(trigger) => { startDrawRef.current = trigger; }} />

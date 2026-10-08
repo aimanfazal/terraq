@@ -73,12 +73,12 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
   };
 
   return (
-    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10" ref={containerRef}>
+    <div className="relative z-10" ref={containerRef}>
       <div className="relative opacity-85">
         <input
           ref={inputRef}
           type="text"
-          placeholder="Location…"
+          placeholder="Search"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
           onFocus={() => { setIsFocused(true); results.length > 0 && setShowResults(true); }}

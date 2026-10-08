@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Field } from "@/data/fields";
-import SearchBar from "./SearchBar";
 import MapToolbar from "./MapToolbar";
 import NewFieldDialog from "./NewFieldDialog";
 import MobileDrawPrompt from "./MobileDrawPrompt";
@@ -54,7 +53,11 @@ interface MapViewProps {
   onRequestStartDraw?: (trigger: () => void) => void;
 }
 
-const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDone, onFieldClickOnMap, onAddField, editBoundaryFieldId, onUpdateField, onCancelEditBoundary, onRequestStartDraw }: MapViewProps) => {
+export interface MapViewHandle {
+  flyToLocation: (lng: number, lat: number) => void;
+}
+
+const MapView = forwardRef<MapViewHandle, MapViewProps>(({ allFields, selectedFields, activeField, flyToField, onFlyToDone, onFieldClickOnMap, onAddField, editBoundaryFieldId, onUpdateField, onCancelEditBoundary, onRequestStartDraw }, ref) => {
   const isMobile = useIsMobile();
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -161,6 +164,15 @@ const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDo
     });
     return () => map.remove();
   }, [mapToken]);
+
+  // Resize map canvas when container dimensions change (e.g. sidebar collapse)
+  useEffect(() => {
+    const container = mapContainer.current;
+    if (!container) return;
+    const ro = new ResizeObserver(() => { mapRef.current?.resize(); });
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, []);
 
   // Sync fields
   useEffect(() => {
@@ -390,7 +402,9 @@ const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDo
     map.once("style.load", () => { if (style === "satellite") hideExtraLabels(map); setMapLoaded(true); refreshFieldLayers(map, allFields, selectedFields); });
   };
 
-  const handleLocationSelect = (lng: number, lat: number) => { mapRef.current?.flyTo({ center: [lng, lat], zoom: 13, duration: 2000 }); };
+  useImperativeHandle(ref, () => ({
+    flyToLocation: (lng: number, lat: number) => { mapRef.current?.flyTo({ center: [lng, lat], zoom: 13, duration: 2000 }); },
+  }));
   const handleToggleDraw = () => { if (drawMode) { setDrawMode(false); setDrawVertices([]); } else { setDrawMode(true); setDrawVertices([]); } };
 
   useEffect(() => {
@@ -461,7 +475,6 @@ const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDo
     <div className="relative w-full h-full">
       {!mapToken && <div className="absolute inset-0 flex items-center justify-center bg-background z-10"><div className="text-muted-foreground text-sm animate-pulse">Loading map…</div></div>}
       <div ref={mapContainer} className="w-full h-full" />
-      <SearchBar onSearch={() => {}} mapToken={mapToken} onLocationSelect={handleLocationSelect} />
       <MapToolbar onZoomIn={() => mapRef.current?.zoomIn()} onZoomOut={() => mapRef.current?.zoomOut()} onStyleChange={handleStyleChange}
         onToggleLayers={() => setShowFields((prev) => !prev)} onToggleDraw={handleToggleDraw} isDrawing={drawMode} showFields={showFields} defaultStyle="satellite"
         onResetNorth={handleResetNorth} onLocateUser={handleLocateUser}
@@ -507,6 +520,6 @@ const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDo
       {showNdvi && <NdviLegend />}
     </div>
   );
-};
+});
 
 export default MapView;
