@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import MapView, { MapViewHandle } from "@/components/MapView";
 import SearchBar from "@/components/SearchBar";
 import WeatherView from "@/components/WeatherView";
@@ -153,13 +154,15 @@ const Index = () => {
   // DESKTOP LAYOUT
   return (
     <div className="h-screen w-screen bg-surface-outer flex items-center justify-center p-6">
-      <div className="w-full h-full max-w-[1400px] max-h-[900px] rounded-2xl overflow-hidden bg-background shadow-2xl relative border-[#041009] border-2">
-        {/* SearchBar centered over the full card, always stable */}
-        <div className="absolute top-4 left-0 right-0 flex justify-center z-20 pointer-events-none">
-          <div className="pointer-events-auto">
-            <SearchBar onSearch={() => {}} onLocationSelect={(lng, lat) => mapViewRef.current?.flyToLocation(lng, lat)} />
+      <div className="w-full h-full max-w-[1400px] max-h-[900px] rounded-2xl overflow-hidden bg-background shadow-2xl relative border-[#060b18] border-2">
+        {/* SearchBar centered over the full card — hidden in analytics view */}
+        {view === "map" && (
+          <div className="absolute top-4 left-0 right-0 flex justify-center z-20 pointer-events-none">
+            <div className="pointer-events-auto">
+              <SearchBar onSearch={() => {}} onLocationSelect={(lng, lat) => mapViewRef.current?.flyToLocation(lng, lat)} />
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex w-full h-full">
           <div className="flex-1 relative">
             <div className="absolute inset-0 transition-opacity duration-200" style={{ opacity: view === "map" ? 1 : 0, pointerEvents: view === "map" ? "auto" : "none" }}>
@@ -171,6 +174,18 @@ const Index = () => {
             <div className="absolute inset-0 transition-opacity duration-200" style={{ opacity: view === "analytics" ? 1 : 0, pointerEvents: view === "analytics" ? "auto" : "none" }}>
               <WeatherView activeField={activeField} selectedFields={selectedFields} allFields={allFields} />
             </div>
+            {/* Toggle button lives here — outside overflow-hidden panel, always visible */}
+            {!isMobile && (
+              <button
+                onClick={() => setSidebarCollapsed(p => !p)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3.5 z-20 w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground shadow-sm transition-colors"
+              >
+                {sidebarCollapsed
+                  ? <ChevronLeft className="w-3.5 h-3.5" />
+                  : <ChevronRight className="w-3.5 h-3.5" />
+                }
+              </button>
+            )}
           </div>
           <SidePanel allFields={allFields} selectedFields={selectedFields} activeField={activeField} detailField={detailField}
             onFieldClick={handleFieldClick} onFieldDoubleClick={handleFieldDoubleClick} onBackFromDetail={() => setDetailField(null)}

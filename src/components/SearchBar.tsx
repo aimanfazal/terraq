@@ -84,20 +84,20 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
           onFocus={() => { setIsFocused(true); results.length > 0 && setShowResults(true); }}
           onBlur={() => setIsFocused(false)}
           className="w-72 backdrop-blur-sm border border-border rounded-full px-4 py-2.5 pr-20 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-          style={{ backgroundColor: "#041009" }} />
+          style={{ backgroundColor: "#060b18" }} />
 
         {isFocused ? (
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         ) : (
           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
-            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#041009" }}>Ctrl</kbd>
-            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#041009" }}>K</kbd>
+            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#060b18" }}>Ctrl</kbd>
+            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#060b18" }}>K</kbd>
           </div>
         )}
       </div>
 
       {showResults && results.length > 0 &&
-      <div className="absolute top-full mt-1 w-72 rounded-lg border border-border overflow-hidden shadow-xl opacity-90" style={{ backgroundColor: "#041009" }}>
+      <div className="absolute top-full mt-1 w-72 rounded-lg border border-border overflow-hidden shadow-xl opacity-90" style={{ backgroundColor: "#060b18" }}>
           {results.map((r) =>
         <button
           key={r.id}

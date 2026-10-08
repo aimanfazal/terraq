@@ -74,7 +74,7 @@ const MapToolbar = ({
                     className={`w-10 h-10 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center transition-colors ${
                       active ? "text-primary bg-accent" : "text-foreground"
                     }`}
-                    style={{ backgroundColor: active ? undefined : "#041009" }}
+                    style={{ backgroundColor: active ? undefined : "#060b18" }}
                   >
                     <Icon className="w-4 h-4" />
                   </button>
