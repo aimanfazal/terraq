@@ -2,7 +2,7 @@
 
 ## Overview
 
-Seven targeted UI improvements to the Virdis desktop interface. All changes are
+Seven targeted UI improvements to the Terraq desktop interface. All changes are
 purely presentational — no data logic, API calls, or routing changes are touched.
 Changes are scoped to four files: `SearchBar.tsx`, `MapToolbar.tsx`, `SidePanel.tsx`,
 `FieldCard.tsx`, and `Index.tsx`.

@@ -12,7 +12,7 @@ export const APP_LANGUAGES: Array<{ code: AppLanguageCode; label: string; native
   { code: "ta", label: "Tamil", nativeLabel: "தமிழ்", aiName: "Tamil (தமிழ்)" },
 ];
 
-const LANGUAGE_STORAGE_KEY = "virdis-language";
+const LANGUAGE_STORAGE_KEY = "terraq-language";
 
 interface LanguageContextValue {
   language: AppLanguageCode;

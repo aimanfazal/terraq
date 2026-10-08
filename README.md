@@ -1,4 +1,4 @@
-# Virdis
+# Terraq
 
 ![React](https://img.shields.io/badge/React-18-000000?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -30,8 +30,8 @@ Requires [Vercel CLI](https://vercel.com/docs/cli) to run the frontend and API r
 
 ```bash
 npm i -g vercel
-git clone https://github.com/your-org/virdis
-cd virdis
+git clone https://github.com/your-org/terraq
+cd terraq
 npm install
 ```
 

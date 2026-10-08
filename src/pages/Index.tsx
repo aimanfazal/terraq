@@ -8,8 +8,8 @@ import MobileBottomNav from "@/components/MobileBottomNav";
 import MobileFieldSheet from "@/components/MobileFieldSheet";
 import { useSwipe } from "@/hooks/use-swipe";
 
-const ALL_FIELDS_KEY = "virdis-regions-v7";
-const SELECTED_IDS_KEY = "virdis-sel-v7";
+const ALL_FIELDS_KEY = "terraq-regions-v7";
+const SELECTED_IDS_KEY = "terraq-sel-v7";
 
 function loadAllFields(): Field[] {
   try {
