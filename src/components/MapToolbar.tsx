@@ -62,7 +62,7 @@ const MapToolbar = ({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="absolute right-4 bottom-6 flex flex-col gap-2 z-10 opacity-85">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10 opacity-85">
         {groups.map((group, gi) => (
           <div key={gi} className="flex flex-col gap-1">
             {gi > 0 && <div className="w-full h-px bg-border/50 my-0.5" />}
@@ -79,7 +79,7 @@ const MapToolbar = ({
                     <Icon className="w-4 h-4" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent side="left">
+                <TooltipContent side="right">
                   {label}
                 </TooltipContent>
               </Tooltip>

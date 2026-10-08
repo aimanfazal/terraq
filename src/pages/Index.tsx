@@ -36,6 +36,7 @@ function loadSelectedIds(allFields: Field[]): string[] {
 const Index = () => {
   const isMobile = useIsMobile();
   const [view, setView] = useState<"map" | "analytics">("map");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const startDrawRef = useRef<(() => void) | null>(null);
   const handleStartDraw = useCallback(() => { startDrawRef.current?.(); }, []);
   const [allFields, setAllFields] = useState<Field[]>(loadAllFields);
@@ -167,7 +168,8 @@ const Index = () => {
             onFieldClick={handleFieldClick} onFieldDoubleClick={handleFieldDoubleClick} onBackFromDetail={() => setDetailField(null)}
             onToggleField={handleToggleField} onApplySelection={handleApplySelection} onUpdateField={handleUpdateField} onDeleteField={handleDeleteField} onEditBoundary={handleEditBoundary}
             onStartDraw={() => { handleStartDraw(); setView("map"); }}
-            view={view} onViewChange={setView} />
+            view={view} onViewChange={setView}
+            collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed(p => !p)} />
         </div>
       </div>
     </div>

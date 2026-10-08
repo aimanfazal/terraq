@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Search, ArrowUpDown, SlidersHorizontal, MapPin, Plus, ArrowDownRight } from "lucide-react";
+import { Search, ArrowUpDown, SlidersHorizontal, MapPin, Plus, ArrowDownRight, ChevronRight, ChevronLeft } from "lucide-react";
 import { Field } from "@/data/fields";
 import FieldCard from "./FieldCard";
 import FieldDetailView from "./FieldDetailView";
@@ -22,6 +22,8 @@ interface SidePanelProps {
   onStartDraw?: () => void;
   view?: "map" | "analytics";
   onViewChange?: (v: "map" | "analytics") => void;
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 const SidePanel = ({
@@ -38,6 +40,8 @@ const SidePanel = ({
   onStartDraw,
   view = "map",
   onViewChange,
+  collapsed = false,
+  onToggleCollapse,
 }: SidePanelProps) => {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
@@ -48,7 +52,15 @@ const SidePanel = ({
 
   if (detailField) {
     return (
-      <div className={`${isMobile ? "w-full" : "w-[320px]"} h-full bg-card/95 backdrop-blur-md border-l border-border flex flex-col animate-fade-in`}>
+      <div className={`${isMobile ? "w-full" : "w-[320px]"} h-full bg-card/95 backdrop-blur-md border-l border-border flex flex-col animate-fade-in relative`}>
+        {!isMobile && (
+          <button
+            onClick={onToggleCollapse}
+            className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        )}
         <FieldDetailView
           field={detailField}
           onBack={onBackFromDetail}
@@ -74,8 +86,31 @@ const SidePanel = ({
 
   const sortLabel = sortBy === "name" ? "Name" : sortBy === "area" ? "Area" : "NDVI";
 
+  if (collapsed) {
+    return (
+      <div className="relative flex-shrink-0">
+        <button
+          onClick={onToggleCollapse}
+          className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+        >
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
+        <div className="w-0 h-full" />
+      </div>
+    );
+  }
+
   return (
-    <div className="w-[320px] h-full bg-card/95 backdrop-blur-md border-l border-border flex flex-col">
+    <div className="w-[320px] h-full bg-card/95 backdrop-blur-md border-l border-border flex flex-col relative transition-all duration-200">
+      {/* Collapse toggle */}
+      {!isMobile && (
+        <button
+          onClick={onToggleCollapse}
+          className="absolute -left-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors shadow-sm"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      )}
       {/* Header: tabs + New Region button */}
       <div className="flex items-center justify-between px-3 pt-3 pb-2 border-b border-border gap-2">
         <div className="flex gap-1 bg-secondary/40 rounded-lg p-1">

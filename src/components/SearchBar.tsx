@@ -73,7 +73,7 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
   };
 
   return (
-    <div className="absolute top-4 left-4 z-10" ref={containerRef}>
+    <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10" ref={containerRef}>
       <div className="relative opacity-85">
         <input
           ref={inputRef}
