@@ -2,6 +2,22 @@ import { X, MoreHorizontal, MapPin } from "lucide-react";
 import { Field, haToAcres } from "@/data/fields";
 import { useState } from "react";
 
+function getNdviDotColor(ndviChange?: number): string {
+  if (ndviChange === undefined) return "hsl(150, 10%, 45%)"; // grey — no data
+  if (ndviChange >= 0.05) return "hsl(120, 55%, 45%)";       // green — improving
+  if (ndviChange >= 0) return "hsl(50, 80%, 50%)";           // amber — stable
+  if (ndviChange >= -0.05) return "hsl(30, 90%, 50%)";       // orange — slight decline
+  return "hsl(0, 62%, 50%)";                                  // red — declining
+}
+
+function getNdviDotLabel(ndviChange?: number): string {
+  if (ndviChange === undefined) return "No NDVI data";
+  if (ndviChange >= 0.05) return "Improving";
+  if (ndviChange >= 0) return "Stable";
+  if (ndviChange >= -0.05) return "Slight decline";
+  return "Declining";
+}
+
 function getPolygonPoints(coordinates: [number, number][][]): string {
   const coords = coordinates[0];
   if (!coords || coords.length < 3) return "10,30 20,8 35,25 25,35";
@@ -68,7 +84,14 @@ const FieldCard = ({ field, onRemove, variant = "select", isActive = false, styl
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground">{field.crop}</div>
+        <div className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <span
+            className="w-2 h-2 rounded-full flex-shrink-0"
+            style={{ backgroundColor: getNdviDotColor(field.ndviChange) }}
+            title={getNdviDotLabel(field.ndviChange)}
+          />
+          {field.crop}
+        </div>
         {isListVariant && field.group && <div className="text-xs text-muted-foreground">{field.group}</div>}
         <div className="text-xs text-muted-foreground flex items-center gap-1">
           <MapPin className="w-3 h-3 text-muted-foreground flex-shrink-0" /> {field.location}

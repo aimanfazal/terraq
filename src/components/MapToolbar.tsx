@@ -43,37 +43,48 @@ const MapToolbar = ({
     onStyleChange?.(next);
   };
 
-  const items = [
-    { icon: Layers, onClick: onToggleLayers ?? (() => {}), label: showFields ? "Hide Regions" : "Show Regions", active: showFields },
-    { icon: Plus, onClick: onZoomIn, label: "Zoom In" },
-    { icon: Minus, onClick: onZoomOut, label: "Zoom Out" },
-    { icon: Map, onClick: handleStyleToggle, label: currentStyle === "dark" ? "Satellite" : "Dark Mode", active: currentStyle === "satellite" },
-    { icon: PenTool, onClick: onToggleDraw ?? (() => {}), label: "Draw Region", active: isDrawing },
-    { icon: Satellite, onClick: onToggleNdvi ?? (() => {}), label: showNdvi ? "Hide NDVI" : "NDVI Overlay", active: showNdvi },
-    { icon: Compass, onClick: onResetNorth ?? (() => {}), label: "Reset North" },
-    { icon: LocateFixed, onClick: onLocateUser ?? (() => {}), label: "My Location" },
+  const groups = [
+    [
+      { icon: Layers, onClick: onToggleLayers ?? (() => {}), label: showFields ? "Hide Regions" : "Show Regions", active: showFields },
+      { icon: Plus, onClick: onZoomIn, label: "Zoom In" },
+      { icon: Minus, onClick: onZoomOut, label: "Zoom Out" },
+      { icon: Map, onClick: handleStyleToggle, label: currentStyle === "dark" ? "Satellite" : "Dark Mode", active: currentStyle === "satellite" },
+    ],
+    [
+      { icon: PenTool, onClick: onToggleDraw ?? (() => {}), label: "Draw Region", active: isDrawing },
+      { icon: Satellite, onClick: onToggleNdvi ?? (() => {}), label: showNdvi ? "Hide NDVI" : "NDVI Overlay", active: showNdvi },
+    ],
+    [
+      { icon: Compass, onClick: onResetNorth ?? (() => {}), label: "Reset North" },
+      { icon: LocateFixed, onClick: onLocateUser ?? (() => {}), label: "My Location" },
+    ],
   ];
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 z-10 opacity-85">
-        {items.map(({ icon: Icon, onClick, label, active }) => (
-          <Tooltip key={label}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={onClick}
-                className={`w-10 h-10 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center transition-colors ${
-                  active ? "text-primary bg-accent" : "text-foreground"
-                }`}
-                style={{ backgroundColor: active ? undefined : "#041009" }}
-              >
-                <Icon className="w-4 h-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right">
-              {label}
-            </TooltipContent>
-          </Tooltip>
+      <div className="absolute right-4 bottom-6 flex flex-col gap-2 z-10 opacity-85">
+        {groups.map((group, gi) => (
+          <div key={gi} className="flex flex-col gap-1">
+            {gi > 0 && <div className="w-full h-px bg-border/50 my-0.5" />}
+            {group.map(({ icon: Icon, onClick, label, active }) => (
+              <Tooltip key={label}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={onClick}
+                    className={`w-10 h-10 rounded-lg backdrop-blur-sm border border-border flex items-center justify-center transition-colors ${
+                      active ? "text-primary bg-accent" : "text-foreground"
+                    }`}
+                    style={{ backgroundColor: active ? undefined : "#041009" }}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="left">
+                  {label}
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
         ))}
       </div>
     </TooltipProvider>

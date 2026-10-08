@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import MapView from "@/components/MapView";
 import WeatherView from "@/components/WeatherView";
 import { fields as initialFieldsData, Field } from "@/data/fields";
@@ -36,6 +36,8 @@ function loadSelectedIds(allFields: Field[]): string[] {
 const Index = () => {
   const isMobile = useIsMobile();
   const [view, setView] = useState<"map" | "analytics">("map");
+  const startDrawRef = useRef<(() => void) | null>(null);
+  const handleStartDraw = useCallback(() => { startDrawRef.current?.(); }, []);
   const [allFields, setAllFields] = useState<Field[]>(loadAllFields);
   const [selectedIds, setSelectedIds] = useState<string[]>(() => loadSelectedIds(loadAllFields()));
   const [activeField, setActiveField] = useState<Field | null>(null);
@@ -99,7 +101,8 @@ const Index = () => {
         <div className="absolute inset-0" style={{ bottom: 0 }}>
           <MapView allFields={allFields} selectedFields={selectedFields} activeField={activeField} flyToField={flyToField}
             onFlyToDone={() => setFlyToField(null)} onFieldClickOnMap={(field) => { setActiveField(field); setDetailField(field); setMobileTab("detail"); }}
-            onAddField={handleAddField} editBoundaryFieldId={editBoundaryFieldId} onUpdateField={handleUpdateField} onCancelEditBoundary={() => setEditBoundaryFieldId(null)} />
+            onAddField={handleAddField} editBoundaryFieldId={editBoundaryFieldId} onUpdateField={handleUpdateField} onCancelEditBoundary={() => setEditBoundaryFieldId(null)}
+            onRequestStartDraw={(trigger) => { startDrawRef.current = trigger; }} />
         </div>
 
         {/* Slide-up sheets for fields/analytics/detail */}
@@ -128,7 +131,9 @@ const Index = () => {
               onFieldClick={handleFieldClick} onFieldDoubleClick={handleFieldDoubleClick}
               onBackFromDetail={() => { setDetailField(null); setMobileTab("map"); }}
               onToggleField={handleToggleField} onApplySelection={handleApplySelection}
-              onUpdateField={handleUpdateField} onDeleteField={handleDeleteField} onEditBoundary={handleEditBoundary} />
+              onUpdateField={handleUpdateField} onDeleteField={handleDeleteField} onEditBoundary={handleEditBoundary}
+              onStartDraw={() => { handleStartDraw(); setMobileTab("map"); }}
+              view={view} onViewChange={(v) => { setView(v); if (v === "analytics") setMobileTab("analytics"); else setMobileTab("map"); }} />
           </div>
         )}
 
@@ -142,26 +147,17 @@ const Index = () => {
     );
   }
 
-  // DESKTOP LAYOUT (unchanged)
+  // DESKTOP LAYOUT
   return (
     <div className="h-screen w-screen bg-surface-outer flex items-center justify-center p-6">
       <div className="w-full h-full max-w-[1400px] max-h-[900px] rounded-2xl overflow-hidden bg-background shadow-2xl relative border-[#041009] border-2">
-        {/* View toggle */}
-        <div className="absolute top-4 z-20 flex gap-1 bg-card/80 backdrop-blur-sm rounded-lg border border-border p-1" style={{ left: "calc(50% - 15px)", transform: "translateX(-50%)" }}>
-          {(["map", "analytics"] as const).map((v) => (
-            <button key={v} onClick={() => setView(v)}
-              className={`px-4 py-1.5 rounded-md text-xs font-medium transition-all duration-300 ${view === v ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
-              {v === "map" ? "Map" : "Analytics"}
-            </button>
-          ))}
-        </div>
-
         <div className="flex w-full h-full">
           <div className="flex-1 relative">
             <div className="absolute inset-0 transition-opacity duration-200" style={{ opacity: view === "map" ? 1 : 0, pointerEvents: view === "map" ? "auto" : "none" }}>
               <MapView allFields={allFields} selectedFields={selectedFields} activeField={activeField} flyToField={flyToField}
                 onFlyToDone={() => setFlyToField(null)} onFieldClickOnMap={(field) => { setActiveField(field); setDetailField(field); }}
-                onAddField={handleAddField} editBoundaryFieldId={editBoundaryFieldId} onUpdateField={handleUpdateField} onCancelEditBoundary={() => setEditBoundaryFieldId(null)} />
+                onAddField={handleAddField} editBoundaryFieldId={editBoundaryFieldId} onUpdateField={handleUpdateField} onCancelEditBoundary={() => setEditBoundaryFieldId(null)}
+                onRequestStartDraw={(trigger) => { startDrawRef.current = trigger; }} />
             </div>
             <div className="absolute inset-0 transition-opacity duration-200" style={{ opacity: view === "analytics" ? 1 : 0, pointerEvents: view === "analytics" ? "auto" : "none" }}>
               <WeatherView activeField={activeField} selectedFields={selectedFields} allFields={allFields} />
@@ -169,7 +165,9 @@ const Index = () => {
           </div>
           <SidePanel allFields={allFields} selectedFields={selectedFields} activeField={activeField} detailField={detailField}
             onFieldClick={handleFieldClick} onFieldDoubleClick={handleFieldDoubleClick} onBackFromDetail={() => setDetailField(null)}
-            onToggleField={handleToggleField} onApplySelection={handleApplySelection} onUpdateField={handleUpdateField} onDeleteField={handleDeleteField} onEditBoundary={handleEditBoundary} />
+            onToggleField={handleToggleField} onApplySelection={handleApplySelection} onUpdateField={handleUpdateField} onDeleteField={handleDeleteField} onEditBoundary={handleEditBoundary}
+            onStartDraw={() => { handleStartDraw(); setView("map"); }}
+            view={view} onViewChange={setView} />
         </div>
       </div>
     </div>

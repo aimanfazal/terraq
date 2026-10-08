@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Search, ArrowUpDown, SlidersHorizontal, MapPin, PenTool } from "lucide-react";
+import { Search, ArrowUpDown, SlidersHorizontal, MapPin, Plus, ArrowDownRight } from "lucide-react";
 import { Field } from "@/data/fields";
 import FieldCard from "./FieldCard";
 import FieldDetailView from "./FieldDetailView";
@@ -19,6 +19,9 @@ interface SidePanelProps {
   onUpdateField: (field: Field) => void;
   onDeleteField: (id: string) => void;
   onEditBoundary?: (field: Field) => void;
+  onStartDraw?: () => void;
+  view?: "map" | "analytics";
+  onViewChange?: (v: "map" | "analytics") => void;
 }
 
 const SidePanel = ({
@@ -32,6 +35,9 @@ const SidePanel = ({
   onUpdateField,
   onDeleteField,
   onEditBoundary,
+  onStartDraw,
+  view = "map",
+  onViewChange,
 }: SidePanelProps) => {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
@@ -70,8 +76,32 @@ const SidePanel = ({
 
   return (
     <div className="w-[320px] h-full bg-card/95 backdrop-blur-md border-l border-border flex flex-col">
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <h2 className="text-lg font-semibold text-foreground">Region List</h2>
+      {/* Header: tabs + New Region button */}
+      <div className="flex items-center justify-between px-3 pt-3 pb-2 border-b border-border gap-2">
+        <div className="flex gap-1 bg-secondary/40 rounded-lg p-1">
+          {(["map", "analytics"] as const).map((v) => (
+            <button
+              key={v}
+              onClick={() => onViewChange?.(v)}
+              className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                view === v
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {v === "map" ? "Map" : "Analytics"}
+            </button>
+          ))}
+        </div>
+        {view === "map" && (
+          <button
+            onClick={onStartDraw}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors flex-shrink-0"
+          >
+            <Plus className="w-3 h-3" />
+            New Region
+          </button>
+        )}
       </div>
 
       <div className="px-3 pt-3">
@@ -130,28 +160,15 @@ const SidePanel = ({
 
       <div className="flex-1 overflow-y-auto px-3 pb-3 space-y-2 pt-1">
         {filtered.length === 0 && allFields.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4">
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-5">
             <div className="w-14 h-14 rounded-full border-2 border-dashed border-muted-foreground/40 flex items-center justify-center">
               <MapPin className="w-6 h-6 text-muted-foreground/60" />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h3 className="text-sm font-semibold text-foreground">No regions yet</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">Create your first region to get started:</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Draw a region on the map to begin</p>
             </div>
-            <div className="text-left space-y-2 w-full">
-              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-accent/15 border border-border/50">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">1</span>
-                <span className="text-xs text-muted-foreground">Click the <PenTool className="inline-block align-text-bottom mx-0.5 text-foreground w-3.5 h-3.5" /> on the left toolbar to draw your region</span>
-              </div>
-              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-accent/15 border border-border/50">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">2</span>
-                <span className="text-xs text-muted-foreground"><strong className="text-foreground">Click on the map</strong> to place boundary points around your region</span>
-              </div>
-              <div className="flex items-start gap-2.5 p-2.5 rounded-lg bg-accent/15 border border-border/50">
-                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-semibold">3</span>
-                <span className="text-xs text-muted-foreground">Press <strong className="text-foreground">Enter</strong> to save or <strong className="text-foreground">Esc</strong> to cancel</span>
-              </div>
-            </div>
+            <ArrowDownRight className="w-5 h-5 text-primary animate-bounce" />
           </div>
         )}
         {filtered.map((field, index) => (

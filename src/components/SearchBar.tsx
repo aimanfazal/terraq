@@ -1,6 +1,5 @@
 import { Search, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { callBackend } from "@/lib/call-backend";
 
 interface SearchBarProps {
@@ -20,8 +19,10 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GeocodingResult[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -31,6 +32,17 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   const geocode = async (text: string) => {
@@ -64,15 +76,24 @@ const SearchBar = ({ onSearch, onLocationSelect }: SearchBarProps) => {
     <div className="absolute top-4 left-4 z-10" ref={containerRef}>
       <div className="relative opacity-85">
         <input
+          ref={inputRef}
           type="text"
           placeholder="Location…"
           value={query}
           onChange={(e) => handleChange(e.target.value)}
-          onFocus={() => results.length > 0 && setShowResults(true)}
-          className="w-72 backdrop-blur-sm border border-border rounded-lg px-4 py-2.5 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+          onFocus={() => { setIsFocused(true); results.length > 0 && setShowResults(true); }}
+          onBlur={() => setIsFocused(false)}
+          className="w-72 backdrop-blur-sm border border-border rounded-full px-4 py-2.5 pr-20 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           style={{ backgroundColor: "#041009" }} />
 
-        <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        {isFocused ? (
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        ) : (
+          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none">
+            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#041009" }}>Ctrl</kbd>
+            <kbd className="px-1.5 py-0.5 rounded text-[10px] font-medium text-muted-foreground border border-border/60" style={{ backgroundColor: "#041009" }}>K</kbd>
+          </div>
+        )}
       </div>
 
       {showResults && results.length > 0 &&

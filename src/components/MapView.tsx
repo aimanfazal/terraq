@@ -51,9 +51,10 @@ interface MapViewProps {
   editBoundaryFieldId?: string | null;
   onUpdateField?: (field: Field) => void;
   onCancelEditBoundary?: () => void;
+  onRequestStartDraw?: (trigger: () => void) => void;
 }
 
-const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDone, onFieldClickOnMap, onAddField, editBoundaryFieldId, onUpdateField, onCancelEditBoundary }: MapViewProps) => {
+const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDone, onFieldClickOnMap, onAddField, editBoundaryFieldId, onUpdateField, onCancelEditBoundary, onRequestStartDraw }: MapViewProps) => {
   const isMobile = useIsMobile();
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -391,6 +392,10 @@ const MapView = ({ allFields, selectedFields, activeField, flyToField, onFlyToDo
 
   const handleLocationSelect = (lng: number, lat: number) => { mapRef.current?.flyTo({ center: [lng, lat], zoom: 13, duration: 2000 }); };
   const handleToggleDraw = () => { if (drawMode) { setDrawMode(false); setDrawVertices([]); } else { setDrawMode(true); setDrawVertices([]); } };
+
+  useEffect(() => {
+    onRequestStartDraw?.(() => { setDrawMode(true); setDrawVertices([]); });
+  }, [onRequestStartDraw]);
 
   const handleSaveNewField = (fieldData: { name: string; crop: string; cropEmoji: string; area: number; color: string; location: string; group?: string; coordinates: [number, number][][]; }) => {
     const newField: Field = { id: `custom-${Date.now()}`, ...fieldData };
